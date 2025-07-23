@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bird Migration Timeline</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: black;
+      color: white;
+    }
+
+    #globeViz {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #pauseBtn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      background-color: #222;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    #nextPageBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #nextPageBtn:hover {
+      background-color: #0056b3;
+    }
+
+    #backPageBtn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 12px 20px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #backPageBtn:hover {
+      background-color: #545b62;
+    }
+  </style>
+</head>
+<body>
+  <div id="globeViz"></div>
+
+  <!-- Buttons -->
+  <button id="pauseBtn">Pause</button>
+  <button id="nextPageBtn">Next</button>
+  <button id="backPageBtn">Back</button>
+
+  <script>
+    // Core bird animation logic
+    function updateBird() {
+      const lat = activeArc.startLat + (activeArc.endLat - activeArc.startLat) * progress;
+      const lng = activeArc.startLng + (activeArc.endLng - activeArc.startLng) * progress;
+      const pos = latLngToVector3(lat, lng, globe.getGlobeRadius() * 1.2);
+      birdSprite.position.copy(pos);
+    }
+
+    function animate() {
+      updateBird();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    function updateMonthDisplay() {
+      months.forEach((m, i) => m.classList.toggle('active', i === activeMonth));
+    }
+
+    function cycleMonth() {
+      updateMonthDisplay();
+      setArcAnimation(activeMonth);
+      activeMonth = (activeMonth + 1) % 12;
+    }
+
+    function startMonthCycle() {
+      cycleMonth();
+      monthInterval = setInterval(cycleMonth, 2000);
+    }
+
+    function stopMonthCycle() {
+      clearInterval(monthInterval);
+    }
+
+    startMonthCycle();
+
+    document.getElementById('pauseBtn').addEventListener('click', () => {
+      paused = !paused;
+      if (paused) {
+        stopMonthCycle();
+        pauseBtn.textContent = 'Play';
+      } else {
+        startMonthCycle();
+        pauseBtn.textContent = 'Pause';
+      }
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
+      window.location.href = 'nextpage.html'; // Replace with your next page path
+    });
+
+    document.getElementById('backPageBtn').addEventListener('click', () => {
+      window.location.href = 'index.html'; // Replace with your previous page path
+    });
+  </script>
+</body>
+</html>

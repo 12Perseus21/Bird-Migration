@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bird Migration Timeline</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="globeViz"></div>
+
+  <div id="sidebar">
+    <div class="species" data-name="Crane">
+      <img src="https://www.svgrepo.com/show/29969/bird-crane-shape.svg" alt="Crane" /> Crane
+      <div class="info"></div>
+    </div>
+    <div class="species" data-name="Eagle">
+      <img src="https://www.svgrepo.com/show/396340/eagle.svg" alt="Eagle" /> Eagle
+      <div class="info"></div>
+    </div>
+    <div class="species" data-name="Goose">
+      <img src="https://www.svgrepo.com/show/322445/goose.svg" alt="Goose" /> Goose
+      <div class="info"></div>
+    </div>
+    <div class="species" data-name="Warbler">
+      <img src="https://www.svgrepo.com/show/417433/bird.svg" alt="Warbler" /> Warbler
+      <div class="info"></div>
+    </div>
+    <div class="species" data-name="Stork">
+      <img src="https://www.svgrepo.com/show/126161/flying-stork.svg" alt="Stork" /> Stork
+      <div class="info"></div>
+    </div>
+    <div class="species" data-name="Swallow">
+      <img src="https://www.svgrepo.com/show/417430/bird.svg" alt="Swallow" /> Swallow
+      <div class="info"></div>
+    </div>
+    <div class="species" data-name="Hawk">
+      <img src="https://www.svgrepo.com/show/417447/bird.svg" alt="Hawk" /> Hawk
+      <div class="info"></div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="pauseBtn">Pause</button>
+  </div>
+
+  <button id="nextBtn">Next</button>
+
+  <div id="monthCycle">
+    <div class="month">Jan</div><div class="month">Feb</div><div class="month">Mar</div>
+    <div class="month">Apr</div><div class="month">May</div><div class="month">Jun</div>
+    <div class="month">Jul</div><div class="month">Aug</div><div class="month">Sep</div>
+    <div class="month">Oct</div><div class="month">Nov</div><div class="month">Dec</div>
+  </div>
+
+  <!-- <div id="birdInfo"></div> old display functionality (Separate Box)-->
+
+  <script type="module" src="./script.js"></script>
+</body>
+</html>
