@@ -117,13 +117,13 @@ body {
 
 #backPageBtn {
   position: absolute;
-  left: 625px;
+  left: 400px;
   bottom: 20px;
 }
 
 #nextPageBtn {
   position: absolute;
-  right: 625px;
+  right: 400px;
   bottom: 20px;
 }
 
