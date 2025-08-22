@@ -2,7 +2,7 @@ import Globe from 'https://esm.sh/globe.gl';
 import * as THREE from 'https://esm.sh/three';
 
 const arcs = [
-  { name: "Crane", startLat: 55, startLng: 20, endLat: 35, endLng: 50, color: 'magenta', months: [8,9,10,3,4] },
+  { name: "Crane", startLat: 48.776320, startLng: -108.360246, endLat: 33.392742, endLng: -102.032121, color: 'magenta', months: [8,9,10,3,4] },
   { name: "Eagle", startLat: 45, startLng: -100, endLat: 25, endLng: -70, color: 'cyan', months: [9,10,11,2,3] },
   { name: "Goose", startLat: 50, startLng: -90, endLat: 30, endLng: -60, color: 'lime', months: [10,11,0,1,2] },
   { name: "Warbler", startLat: 35, startLng: -80, endLat: 15, endLng: -50, color: 'yellow', months: [2,3,4,5] },
@@ -45,179 +45,131 @@ function latLngToVector3(lat, lng, radius = 100) {
 const months = document.querySelectorAll('.month');
 let activeMonth = 0;
 let activeArc = null;
-let paused = false;
-let monthInterval;
 let progress = 0;
+let intervalId = null;
+let isPlaying = true; // auto-cycle enabled by default
+
+function updateArcsForMonth(monthIndex) {
+  // Only keep arcs active in this month
+  const visibleArcs = arcs.filter(arc => arc.months.includes(monthIndex));
+  globe.arcsData(visibleArcs);
+}
 
 function setArcAnimation(monthIndex) {
+  updateArcsForMonth(monthIndex); // filter arcs
+
   globe.arcDashAnimateTime((arc) =>
     arc.months.includes(monthIndex) ? 2000 : 0
   );
+
   activeArc = arcs.find(arc => arc.months.includes(monthIndex)) || null;
   progress = 0;
 }
-
-function updateBird() {
-  if (paused || !activeArc) return;
-  progress += 0.01;
-  if (progress > 1) progress = 0;
-
-  const lat = activeArc.startLat + (activeArc.endLat - activeArc.startLat) * progress;
-  const lng = activeArc.startLng + (activeArc.endLng - activeArc.startLng) * progress;
-  const pos = latLngToVector3(lat, lng, globe.getGlobeRadius() * 1.2);
-  birdSprite.position.copy(pos);
-}
-
-function animate() {
-  updateBird();
-  requestAnimationFrame(animate);
-}
-
-animate();
 
 function updateMonthDisplay() {
   months.forEach((m, i) => m.classList.toggle('active', i === activeMonth));
 }
 
-function cycleMonth() {
-  updateMonthDisplay();
-  setArcAnimation(activeMonth);
+// Cycle forwards
+function nextMonth() {
   activeMonth = (activeMonth + 1) % 12;
+  setArcAnimation(activeMonth);
+  updateMonthDisplay();
 }
 
+// Cycle backwards
+function prevMonth() {
+  activeMonth = (activeMonth - 1 + 12) % 12;
+  setArcAnimation(activeMonth);
+  updateMonthDisplay();
+}
+
+// Auto-cycle controller
 function startMonthCycle() {
-  cycleMonth();
-  monthInterval = setInterval(cycleMonth, 2000);
+  if (!intervalId) {
+    intervalId = setInterval(() => {
+      nextMonth();
+    }, 4000); // 4 seconds per month
+  }
 }
 
 function stopMonthCycle() {
-  clearInterval(monthInterval);
+  clearInterval(intervalId);
+  intervalId = null;
 }
 
-startMonthCycle();
+// Pause auto-cycle and update button
+function pauseAutoCycle() {
+  stopMonthCycle();
+  isPlaying = false;
+  pauseBtn.textContent = 'Play';
+}
 
+// Button wiring
+document.getElementById('nextPageBtn').addEventListener('click', () => {
+  pauseAutoCycle();
+  nextMonth();
+});
+
+document.getElementById('backPageBtn').addEventListener('click', () => {
+  pauseAutoCycle();
+  prevMonth();
+});
+
+// Play/Pause button
 document.getElementById('pauseBtn').addEventListener('click', () => {
-  paused = !paused;
-  if (paused) {
-    stopMonthCycle();
-    pauseBtn.textContent = 'Play';
+  if (isPlaying) {
+    pauseAutoCycle();
   } else {
     startMonthCycle();
+    isPlaying = true;
     pauseBtn.textContent = 'Pause';
   }
 });
 
-/*document.getElementById('nextBtn').addEventListener('click', () => {
-  if (!paused) {
-    stopMonthCycle();
-    activeMonth = (activeMonth + 1) % 12;
-    updateMonthDisplay();
-    setArcAnimation(activeMonth);
-  }
-});*/ //old next button functionality
-
-/* document.getElementById('backPageBtn').addEventListener('click', () => {
-  window.location.href = 'Page2.html';
-});
-
-document.getElementById('homePageBtn').addEventListener('click', () => {
-  window.location.href = 'HomePage.html';
-}); */ // Removed home page and back page button functionality
-
-/*const speciesDivs = document.querySelectorAll('.species');
-const birdInfo = document.getElementById('birdInfo');
-
-const birdDetails = {
-  Crane: {
-    speed: "50-60 km/h",
-    altitude: "3,000 meters",
-    population: "250,000",
-    origin: "Northern Europe"
-  },
-  Eagle: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
-  },
-  Goose: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
-  },
-  Warbler: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
-  },
-  Stork: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
-  },
-  Swallow: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
-  },
-  Hawk: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
-  }
-}; */
+// start with auto-cycle running
+startMonthCycle();
 
 const speciesDivs = document.querySelectorAll('.species');
 
 const birdDetails = {
   Crane: {
-    speed: "50-60 km/h",
-    altitude: "3,000 meters",
-    population: "250,000",
-    origin: "Northern Europe"
+    speed: "40-56 km/h",
+    altitude: "1,600 m",
+    origin: "N.A and Siberia" 
   },
   Eagle: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
+    speed: "~28-45 km/h",
+    altitude: "300-1,500 m",
+    origin: "N.A and Eurasia"
   },
   Goose: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
+    speed: "50-60 km/h",
+    altitude: "600-1,200 ft",
+    origin: "Northern hemisphere"
   },
   Warbler: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
+    speed: "30-40 km/h",
+    altitude: "Up to 1,000 m",
+    origin: "Central America"
   },
   Stork: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
+    speed: "Up to 50 km/h",
+    altitude: "Up to 2,000 m",
+    origin: "Europe and Asia"
   },
   Swallow: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
+    speed: "~32 km/h",
+    altitude: "Up to 600 m",
+    origin: "Northern Hemisphere"
   },
   Hawk: {
-    speed: "120-160 km/h",
-    altitude: "4,500 meters",
-    population: "500,000",
-    origin: "North America"
+    speed: "~50-70 km/h",
+    altitude: "500-2,000 m",
+    origin: "N.A and Eurasia"
   }
 };
+
 
 speciesDivs.forEach(div => {
   const name = div.getAttribute('data-name');
@@ -228,8 +180,7 @@ speciesDivs.forEach(div => {
     infoDiv.innerHTML = `
       <ul style="margin: 0; padding-left: 18px;">
         <li><strong>Speed:</strong> ${bird.speed}</li>
-        <li><strong>Maximum altitude:</strong> ${bird.altitude}</li>
-        <li><strong>Population:</strong> ${bird.population}</li>
+        <li><strong>Max altitude:</strong> ${bird.altitude}</li>
         <li><strong>Origin:</strong> ${bird.origin}</li>
       </ul>
     `;
